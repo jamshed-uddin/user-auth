@@ -1,61 +1,70 @@
-const Joi = require("joi");
-const User = require("../models/userModel");
+const Users = require("../models/userModel");
+const { customError } = require("../utils/customError");
+const { generateToken } = require("../utils/generateToken");
+const { validateUserInfo } = require("../utils/validate");
 
 const registerUser = async (req, res, next) => {
   try {
     const userInfo = req.body;
-    const validate = Joi.object({
-      userName: Joi.string().required().messages({
-        "string.base": "Username must be a string",
-        "string.empty": "Username is required",
-      }),
-      email: Joi.string().email().required().messages({
-        "string.base": "Email must be a string",
-        "string.email": "Please provide a valid email address",
-        "string.empty": "Email is required",
-      }),
-      fullName: Joi.string().required().messages({
-        "string.base": "Full name must be a string",
-        "string.empty": "Full name is required",
-      }),
-      password: Joi.string().min(6).required().messages({
-        "string.base": "Password must be a string",
-        "string.empty": "Password is required",
-        "string.min": "Password must be at least 6 character long",
-      }),
-      gender: Joi.string()
-        .valid("male", "female", "other")
-        .required()
-        .messages({
-          "string.base": "Gender must be a string",
-          "string.empty": "Gender is required",
-          "any.only":
-            "Gender must be one of the following values: male, female, other",
-        }),
-      dateOfBirth: Joi.date().required().messages({
-        "date.base": "Date of birth must be a valid date",
-        "date.empty": "Date of birth is required",
-      }),
-      country: Joi.string().required().messages({
-        "string.base": "Country must be a string",
-        "string.empty": "Country is required",
-      }),
-    });
 
-    const { error, value } = validate(userInfo);
+    const { error, value } = validateUserInfo(userInfo);
+
     if (error) {
-      throw error;
+      throw customError(400, error?.message);
     }
 
-    const newUser = await User.create(value);
-    res.status(200).send({ message: "User registered", data: newUser });
+    const [existingUserName, existingUserEmail] = await Promise.all([
+      Users.findOne({ userName: value.userName }),
+      Users.findOne({ email: value.email }),
+    ]);
+    if (existingUserName) {
+      throw customError(400, "Username already taken");
+    }
+    if (existingUserEmail) {
+      throw customError(400, "User email already registered");
+    }
+
+    const newUser = await Users.create(value);
+    const userWithoutPassword = newUser.toObject();
+    delete userWithoutPassword.password;
+    const response = {
+      ...userWithoutPassword,
+      token: generateToken(userWithoutPassword._id),
+    };
+
+    res.status(200).send({ message: "User registered", data: response });
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };
 
 const loginUser = async (req, res, next) => {
   try {
+    const { email, userName, password } = req.body;
+    if (!email && !userName) {
+      throw customError(400, "Email or username is required");
+    }
+
+    const user = await Users.findOne({ $or: [{ userName }, { email }] });
+
+    console.log(user);
+
+    if (user && (await user.matchPassword(password))) {
+      const userWithoutPassword = user?.toObject();
+      delete userWithoutPassword.password;
+
+      const response = {
+        ...userWithoutPassword,
+        token: generateToken(userWithoutPassword._id),
+      };
+
+      res
+        .status(200)
+        .send({ message: "User login successfull", data: response });
+    } else {
+      throw customError(400, "Invalid credentails");
+    }
   } catch (error) {
     next(error);
   }
@@ -63,6 +72,20 @@ const loginUser = async (req, res, next) => {
 
 const searchUser = async (req, res, next) => {
   try {
+    const { q } = req.query;
+    if (!q) {
+      throw customError(400, "Search query is required.");
+    }
+
+    const user = await Users.findOne({
+      $or: [{ email: { $regex: new RegExp(`^${q}`, "i") } }, { userName: q }],
+    }).select("-password");
+
+    if (!user) {
+      throw customError(404, "User not found");
+    }
+
+    res.status(200).send({ message: "User found", data: user });
   } catch (error) {
     next(error);
   }

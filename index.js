@@ -5,7 +5,10 @@ const port = process.env.PORT || 5000;
 const userRoutes = require("./routes/userRoutes");
 const { errorMid } = require("./middlewares/errorMid");
 const connectdb = require("./config/connectdb");
+app.use(express.json());
+app.use(express.urlencoded());
 connectdb();
+
 app.use("/api/users", userRoutes);
 
 app.use(errorMid);
