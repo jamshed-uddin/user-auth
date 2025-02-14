@@ -7,7 +7,7 @@ const {
 const { protectMid } = require("../middlewares/protectMid");
 const router = express.Router();
 
-router.post("/register", registerUser);
-router.post("/login", loginUser);
+router.post("/register", registerUser); //public
+router.post("/login", loginUser); //public
 router.get("/search", protectMid, searchUser); //private
 module.exports = router;

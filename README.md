@@ -2,9 +2,11 @@
 
 This is a server for user authentication and searching user.
 
-### Postman documentation
+### API endpoints documentation in Postman
 
 [https://documenter.getpostman.com/view/29126982/2sAYXECxby](https://documenter.getpostman.com/view/29126982/2sAYXECxby)
+
+#### 🎬 A video walkthrough of the app source code, postman result and database [here](https://drive.google.com/file/d/1WZ8UbjxK6iRrZ3hxMpoghbGJ9BpuxQAA/view?usp=drive_link)
 
 ## Table of Contents
 
@@ -125,15 +127,15 @@ NODE_ENV=developement
 ## Packages and Dependencies
 
 ```env
-        "dependencies": {
-          "bcryptjs": "^3.0.0",
-          "dotenv": "^16.4.7",
-          "express": "^4.21.2",
-          "joi": "^17.13.3",
-          "jsonwebtoken": "^9.0.2",
-          "mongoose": "^8.10.0"
-         },
-        "devDependencies": {
-          "nodemon": "^3.1.9"
-         }
+ "dependencies": {
+    "bcryptjs": "^3.0.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.10.0"
+ },
+ "devDependencies": {
+    "nodemon": "^3.1.9"
+ }
 ```
