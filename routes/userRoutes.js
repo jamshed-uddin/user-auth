@@ -4,9 +4,10 @@ const {
   loginUser,
   searchUser,
 } = require("../controllers/userControllers");
+const { protectMid } = require("../middlewares/protectMid");
 const router = express.Router();
 
 router.post("/register", registerUser);
 router.post("/login", loginUser);
-router.get("/search", searchUser);
+router.get("/search", protectMid, searchUser); //private
 module.exports = router;

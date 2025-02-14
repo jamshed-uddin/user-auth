@@ -3,6 +3,10 @@ const { customError } = require("../utils/customError");
 const { generateToken } = require("../utils/generateToken");
 const { validateUserInfo } = require("../utils/validate");
 
+// @desc User registration
+// POST/api/users/registration
+// @access public
+
 const registerUser = async (req, res, next) => {
   try {
     const userInfo = req.body;
@@ -39,6 +43,9 @@ const registerUser = async (req, res, next) => {
   }
 };
 
+// @desc User login
+// POST/api/users/login
+// @access public
 const loginUser = async (req, res, next) => {
   try {
     const { email, userName, password } = req.body;
@@ -70,6 +77,9 @@ const loginUser = async (req, res, next) => {
   }
 };
 
+// @desc Search user by username or email
+// POST/api/users/search?q=''
+// @access private
 const searchUser = async (req, res, next) => {
   try {
     const { q } = req.query;

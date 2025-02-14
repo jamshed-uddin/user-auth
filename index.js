@@ -9,6 +9,10 @@ app.use(express.json());
 app.use(express.urlencoded());
 connectdb();
 
+app.get("/", async () => {
+  res.status(200).send({ message: "Server is running" });
+});
+
 app.use("/api/users", userRoutes);
 
 app.use(errorMid);
