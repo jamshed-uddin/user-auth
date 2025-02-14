@@ -2,6 +2,10 @@
 
 This is a server for user authentication and searching user.
 
+### Postman documentation
+
+[https://documenter.getpostman.com/view/29126982/2sAYXECxby](https://documenter.getpostman.com/view/29126982/2sAYXECxby)
+
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
